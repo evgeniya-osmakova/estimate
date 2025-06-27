@@ -2,6 +2,7 @@
 
 import React from 'react';
 import styled from 'styled-components';
+import Link from 'next/link';
 
 const Container = styled.div`
   max-width: 1200px;
@@ -78,10 +79,25 @@ const Button = styled.button`
   }
 `;
 
+const StyledLink = styled(Link)`
+  display: inline-block;
+  padding: 8px 12px;
+  background-color: #2196f3;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  margin-bottom: 20px;
+
+  &:hover {
+    background-color: #0b7dda;
+  }
+`;
+
 export default function Home() {
   return (
     <Container>
       <Title>Редактор сметы</Title>
+      <StyledLink href="/about">О проекте</StyledLink>
 
       <Table>
         <thead>
