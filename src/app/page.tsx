@@ -1,146 +1,301 @@
 'use client';
 
-import React from 'react';
-import styled from 'styled-components';
-import Link from 'next/link';
-
-const Container = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-`;
-
-const Title = styled.h1`
-  font-size: 24px;
-  margin-bottom: 20px;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-`;
-
-const TableHeader = styled.th`
-  background-color: #f2f2f2;
-  padding: 10px;
-  text-align: left;
-  border: 1px solid #ddd;
-`;
-
-const TableCell = styled.td`
-  padding: 10px;
-  border: 1px solid #ddd;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  max-width: 500px;
-  margin-top: 30px;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-`;
-
-const FormTitle = styled.h2`
-  font-size: 18px;
-  margin-bottom: 15px;
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: 15px;
-`;
-
-const Label = styled.label`
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-`;
-
-const Button = styled.button`
-  padding: 10px 15px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  align-self: flex-start;
-
-  &:hover {
-    background-color: #45a049;
-  }
-`;
-
-const StyledLink = styled(Link)`
-  display: inline-block;
-  padding: 8px 12px;
-  background-color: #2196f3;
-  color: white;
-  text-decoration: none;
-  border-radius: 4px;
-  margin-bottom: 20px;
-
-  &:hover {
-    background-color: #0b7dda;
-  }
-`;
+import React, { useState, useRef, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import Button from '@/components/ui/Button';
+import StyledLink from '@/components/ui/StyledLink';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { addItem, updateItem, deleteItem, selectItems, selectTotalSum } from '@/store/itemsSlice';
+import { EstimateItem } from '@/types';
+import {
+  CellInput,
+  EditableCell,
+  Table,
+  TableCell,
+  TableHeader,
+  Title,
+  Container,
+  Input,
+  CenteredCell,
+  TotalSum,
+} from '@/app/style'
 
 export default function Home() {
+  const dispatch = useAppDispatch();
+  const items = useAppSelector(selectItems);
+  const totalSum = useAppSelector(selectTotalSum);
+
+  const formSchema = z.object({
+    name: z.string().min(1, { message: "Name is required" }),
+    quantity: z.number().positive({ message: "Quantity must be greater than 0" }),
+    price: z.number().positive({ message: "Price must be greater than 0" })
+  });
+
+  type FormData = z.infer<typeof formSchema>;
+
+  const {
+    register,
+    handleSubmit: hookFormSubmit,
+    formState: { errors },
+    reset,
+    watch
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: '',
+      quantity: 1,
+      price: 0
+    }
+  });
+
+  const watchedValues = watch();
+
+  const [editingCell, setEditingCell] = useState<{
+    itemId: string | null;
+    field: string | null;
+  }>({
+    itemId: null,
+    field: null
+  });
+
+  const [editValue, setEditValue] = useState<string>('');
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (editingCell.itemId !== null && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [editingCell]);
+
+  const handleCellClick = (itemId: string, field: 'name' | 'quantity' | 'pricePerUnit', value: string | number) => {
+    setEditingCell({ itemId, field });
+    setEditValue(String(value));
+  };
+
+  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditValue(e.target.value);
+  };
+
+  const handleEditSave = () => {
+    if (editingCell.itemId !== null && editingCell.field !== null) {
+      const value = editingCell.field === 'name'
+        ? editValue
+        : parseFloat(editValue) || 0;
+
+      dispatch(updateItem({
+        id: editingCell.itemId,
+        field: editingCell.field,
+        value
+      }));
+
+      setEditingCell({ itemId: null, field: null });
+      setEditValue('');
+    }
+  };
+
+  const handleEditKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleEditSave();
+    } else if (e.key === 'Escape') {
+      setEditingCell({ itemId: null, field: null });
+      setEditValue('');
+    }
+  };
+
+  const handleBlur = () => {
+    handleEditSave();
+  };
+
+  const handleNewItemKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const inputs = document.querySelectorAll('tfoot input');
+      const currentIndex = Array.from(inputs).indexOf(e.target as HTMLInputElement);
+
+      if (currentIndex < inputs.length - 1) {
+        (inputs[currentIndex + 1] as HTMLInputElement).focus();
+      } else {
+        document.getElementById('add-item-button')?.click();
+      }
+    }
+  };
+
+  const onSubmit = (data: FormData) => {
+    dispatch(addItem({
+      name: data.name,
+      quantity: data.quantity,
+      pricePerUnit: data.price
+    }));
+
+    reset({
+      name: '',
+      quantity: 1,
+      price: 0
+    });
+  };
+
+  const handleDelete = (id: string) => {
+    dispatch(deleteItem(id));
+  };
+
+  const tableHeaders = ['Name', 'Quantity', 'Price per unit', 'Total', 'Actions'];
+
   return (
     <Container>
-      <Title>Редактор сметы</Title>
-      <StyledLink href="/about">О проекте</StyledLink>
+      <Title>Estimate Editor</Title>
+      <StyledLink href="/about" variant="secondary" marginBottom="20px">About</StyledLink>
 
       <Table>
         <thead>
           <tr>
-            <TableHeader>№</TableHeader>
-            <TableHeader>Наименование</TableHeader>
-            <TableHeader>Количество</TableHeader>
-            <TableHeader>Цена за единицу</TableHeader>
-            <TableHeader>Сумма</TableHeader>
+            {tableHeaders.map((header, index) => (
+              <TableHeader key={index}>
+                {header}
+              </TableHeader>
+            ))}
           </tr>
         </thead>
+
         <tbody>
-          <tr>
-            <TableCell>1</TableCell>
-            <TableCell>Пример позиции</TableCell>
-            <TableCell>2</TableCell>
-            <TableCell>1000 ₽</TableCell>
-            <TableCell>2000 ₽</TableCell>
-          </tr>
-          {/* Здесь будут отображаться добавленные позиции */}
+          {items.map((item) => (
+            <tr key={item.id}>
+              <EditableCell
+                $isEditing={editingCell.itemId === item.id && editingCell.field === 'name'}
+                onClick={() => handleCellClick(item.id, 'name', item.name)}
+              >
+                {editingCell.itemId === item.id && editingCell.field === 'name' ? (
+                  <CellInput
+                    ref={inputRef}
+                    type="text"
+                    value={editValue}
+                    onChange={handleEditChange}
+                    onBlur={handleBlur}
+                    onKeyDown={handleEditKeyPress}
+                  />
+                ) : (
+                  item.name
+                )}
+              </EditableCell>
+
+              <EditableCell
+                $isEditing={editingCell.itemId === item.id && editingCell.field === 'quantity'}
+                onClick={() => handleCellClick(item.id, 'quantity', item.quantity)}
+              >
+                {editingCell.itemId === item.id && editingCell.field === 'quantity' ? (
+                  <CellInput
+                    ref={inputRef}
+                    type="number"
+                    min="1"
+                    value={editValue}
+                    onChange={handleEditChange}
+                    onBlur={handleBlur}
+                    onKeyDown={handleEditKeyPress}
+                  />
+                ) : (
+                  item.quantity
+                )}
+              </EditableCell>
+
+              <EditableCell
+                $isEditing={editingCell.itemId === item.id && editingCell.field === 'pricePerUnit'}
+                onClick={() => handleCellClick(item.id, 'pricePerUnit', item.pricePerUnit)}
+              >
+                {editingCell.itemId === item.id && editingCell.field === 'pricePerUnit' ? (
+                  <CellInput
+                    ref={inputRef}
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={editValue}
+                    onChange={handleEditChange}
+                    onBlur={handleBlur}
+                    onKeyDown={handleEditKeyPress}
+                  />
+                ) : (
+                  `${item.pricePerUnit} $`
+                )}
+              </EditableCell>
+
+              <TableCell>{`${item.totalPrice} $`}</TableCell>
+
+              <CenteredCell>
+                <Button variant="danger" onClick={() => handleDelete(item.id)}>
+                  Delete
+                </Button>
+              </CenteredCell>
+            </tr>
+          ))}
         </tbody>
+
+        <tfoot>
+          <tr>
+            <TableCell>
+              <div style={{ position: 'relative' }}>
+                <Input
+                  type="text"
+                  placeholder="Name"
+                  {...register('name')}
+                  onKeyDown={handleNewItemKeyPress}
+                />
+                {errors.name && (
+                  <div style={{ color: 'red', fontSize: '12px', position: 'absolute' }}>
+                    {errors.name.message}
+                  </div>
+                )}
+              </div>
+            </TableCell>
+            <TableCell>
+              <div style={{ position: 'relative' }}>
+                <Input
+                  type="number"
+                  min="1"
+                  placeholder="Quantity"
+                  {...register('quantity', { valueAsNumber: true })}
+                  onKeyDown={handleNewItemKeyPress}
+                />
+                {errors.quantity && (
+                  <div style={{ color: 'red', fontSize: '12px', position: 'absolute' }}>
+                    {errors.quantity.message}
+                  </div>
+                )}
+              </div>
+            </TableCell>
+            <TableCell>
+              <div style={{ position: 'relative' }}>
+                <Input
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  placeholder="Price"
+                  {...register('price', { valueAsNumber: true })}
+                  onKeyDown={handleNewItemKeyPress}
+                />
+                {errors.price && (
+                  <div style={{ color: 'red', fontSize: '12px', position: 'absolute' }}>
+                    {errors.price.message}
+                  </div>
+                )}
+              </div>
+            </TableCell>
+            <TableCell>
+              {watchedValues.name && watchedValues.quantity && watchedValues.price
+                ? `${watchedValues.quantity * watchedValues.price} $`
+                : ''}
+            </TableCell>
+            <CenteredCell>
+              <Button
+                id="add-item-button"
+                onClick={hookFormSubmit(onSubmit)}
+              >
+                Add
+              </Button>
+            </CenteredCell>
+          </tr>
+        </tfoot>
       </Table>
-
-      <Form>
-        <FormTitle>Добавление позиции</FormTitle>
-
-        <FormGroup>
-          <Label htmlFor="name">Наименование</Label>
-          <Input type="text" id="name" name="name" />
-        </FormGroup>
-
-        <FormGroup>
-          <Label htmlFor="quantity">Количество</Label>
-          <Input type="number" id="quantity" name="quantity" min="1" />
-        </FormGroup>
-
-        <FormGroup>
-          <Label htmlFor="price">Цена за единицу</Label>
-          <Input type="number" id="price" name="price" min="0" step="0.01" />
-        </FormGroup>
-
-        <Button type="submit">Добавить</Button>
-      </Form>
+      <TotalSum>Total: {totalSum} $</TotalSum>
     </Container>
   );
 }

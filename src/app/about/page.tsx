@@ -2,7 +2,7 @@
 
 import React from 'react';
 import styled from 'styled-components';
-import Link from 'next/link';
+import StyledLink from '@/components/ui/StyledLink';
 
 const Container = styled.div`
   max-width: 1200px;
@@ -24,37 +24,24 @@ const Paragraph = styled.p`
   margin-bottom: 15px;
 `;
 
-const StyledLink = styled(Link)`
-  display: inline-block;
-  padding: 10px 15px;
-  background-color: #4caf50;
-  color: white;
-  text-decoration: none;
-  border-radius: 4px;
-  margin-top: 20px;
-  
-  &:hover {
-    background-color: #45a049;
-  }
-`;
 
 export default function About() {
   return (
     <Container>
-      <Title>О проекте</Title>
+      <Title>About</Title>
 
       <Content>
         <Paragraph>
-          Данное приложение представляет собой редактор смет, который позволяет создавать и редактировать сметы для различных проектов.
+          This application is an estimate editor that allows you to create and edit estimates for various projects.
         </Paragraph>
 
         <Paragraph>
-          С помощью этого инструмента вы можете добавлять позиции в смету, указывая их наименование, количество и цену за единицу.
-          Система автоматически рассчитает общую стоимость каждой позиции и всей сметы в целом.
+          With this tool, you can add items to the estimate, specifying their name, quantity, and price per unit.
+          The system will automatically calculate the total cost of each item and the entire estimate.
         </Paragraph>
       </Content>
 
-      <StyledLink href="/">Вернуться на главную</StyledLink>
+      <StyledLink href="/" marginTop="20px">Back to Home</StyledLink>
     </Container>
   );
 }
