@@ -4,11 +4,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { v4 as uuidv4 } from 'uuid';
 import Button from '@/components/ui/Button';
 import StyledLink from '@/components/ui/StyledLink';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addItem, updateItem, deleteItem, selectItems, selectTotalSum } from '@/store/itemsSlice';
 import { EstimateItem } from '@/types';
+import { useToast } from '@/components/providers/ToastProvider';
 import {
   CellInput,
   EditableCell,
@@ -20,12 +22,14 @@ import {
   Input,
   CenteredCell,
   TotalSum,
+  ActionsContainer,
 } from '@/app/style'
 
 export default function Home() {
   const dispatch = useAppDispatch();
   const items = useAppSelector(selectItems);
   const totalSum = useAppSelector(selectTotalSum);
+  const { showToast } = useToast();
 
   const formSchema = z.object({
     name: z.string().min(1, { message: "Name is required" }),
@@ -49,6 +53,14 @@ export default function Home() {
       price: 0
     }
   });
+
+  // Show error toast when validation fails
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      const errorMessages = Object.values(errors).map(error => error.message);
+      showToast(`Validation error: ${errorMessages.join(', ')}`, 'error');
+    }
+  }, [errors, showToast]);
 
   const watchedValues = watch();
 
@@ -90,6 +102,8 @@ export default function Home() {
         value
       }));
 
+      showToast("Estimate saved", 'success');
+
       setEditingCell({ itemId: null, field: null });
       setEditValue('');
     }
@@ -129,6 +143,8 @@ export default function Home() {
       pricePerUnit: data.price
     }));
 
+    showToast("Estimate saved", 'success');
+
     reset({
       name: '',
       quantity: 1,
@@ -138,6 +154,38 @@ export default function Home() {
 
   const handleDelete = (id: string) => {
     dispatch(deleteItem(id));
+    showToast("Estimate saved", 'success');
+  };
+
+  const handleDownloadJSON = () => {
+    // Create the estimate object with the current data
+    const estimate = {
+      id: uuidv4(), // Generate a unique ID for this estimate
+      items: items,
+      totalSum: totalSum
+    };
+
+    // Convert the estimate object to a JSON string
+    const jsonString = JSON.stringify(estimate, null, 2);
+
+    // Create a blob from the JSON string
+    const blob = new Blob([jsonString], { type: 'application/json' });
+
+    // Create a URL for the blob
+    const url = URL.createObjectURL(blob);
+
+    // Create a temporary anchor element to trigger the download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `estimate-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+
+    // Clean up
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast("Estimate downloaded", 'success');
   };
 
   const tableHeaders = ['Name', 'Quantity', 'Price per unit', 'Total', 'Actions'];
@@ -295,7 +343,11 @@ export default function Home() {
           </tr>
         </tfoot>
       </Table>
-      <TotalSum>Total: {totalSum} $</TotalSum>
+
+      <ActionsContainer>
+        <Button onClick={handleDownloadJSON}>Download JSON</Button>
+        <TotalSum>Total: {totalSum} $</TotalSum>
+      </ActionsContainer>
     </Container>
   );
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import StyledComponentsRegistry from '@/lib/registry';
 import ReduxProvider from '@/components/providers/ReduxProvider';
+import ToastProvider from '@/components/providers/ToastProvider';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -18,9 +19,11 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <ReduxProvider>
-          <StyledComponentsRegistry>
-            {children}
-          </StyledComponentsRegistry>
+          <ToastProvider>
+            <StyledComponentsRegistry>
+              {children}
+            </StyledComponentsRegistry>
+          </ToastProvider>
         </ReduxProvider>
       </body>
     </html>

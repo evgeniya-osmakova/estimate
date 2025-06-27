@@ -19,6 +19,13 @@ export const TotalSum = styled.div`
   padding: 10px;
 `;
 
+export const ActionsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+`;
+
 export const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
