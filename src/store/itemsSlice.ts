@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { v4 as uuidv4 } from 'uuid';
-import { Estimate, EstimateItem } from '@/types'
+import { Estimate, EstimateItem, Field, Fields } from '@/types'
 
 const initialState: Estimate = {
   id: '00000000-0000-0000-0000-000000000000',
@@ -28,21 +28,28 @@ export const itemsSlice = createSlice({
 
     updateItem: (state, action: PayloadAction<{
       id: string;
-      field: 'name' | 'quantity' | 'pricePerUnit';
+      field: Field;
       value: string | number
     }>) => {
       const { id, field, value } = action.payload;
-      const item = state.items.find(item => item.id === id);
+      const item = state.items.find(i => i.id === id);
+      if (!item) return;
 
-      if (item) {
-        item[field] = value as never;
-
-        if (field === 'quantity' || field === 'pricePerUnit') {
-          item.totalPrice = item.quantity * item.pricePerUnit;
-
-          state.totalSum = state.items.reduce((sum, item) => sum + item.totalPrice, 0);
-        }
+      switch (field) {
+        case Fields.NAME:
+          item.name = value as string;
+          break;
+        case Fields.QUANTITY:
+          item.quantity = value as number;
+          break;
+        case Fields.PRICE_PER_UNIT:
+          item.pricePerUnit = value as number;
+          break;
       }
+
+      item.totalPrice = item.quantity * item.pricePerUnit;
+
+      state.totalSum = state.items.reduce((sum, i) => sum + i.totalPrice, 0);
     },
 
     deleteItem: (state, action: PayloadAction<string>) => {

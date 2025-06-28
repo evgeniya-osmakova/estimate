@@ -49,9 +49,9 @@ export const TableCell = styled.td<{ $width?: string }>`
 export const EditableCell = styled(TableCell)<{ $isEditing: boolean, $width?: string }>`
   cursor: pointer;
   background-color: ${props => props.$isEditing ? '#f9f9f9' : 'transparent'};
-    max-width: ${props => props.$width};
-    width: ${props => props.$width ?? 'auto'};
-    word-wrap: break-word;
+  max-width: ${props => props.$width};
+  width: ${props => props.$width ?? 'auto'};
+  word-wrap: break-word;
 `;
 
 export const CenteredCell = styled(TableCell)`

@@ -11,3 +11,12 @@ export interface Estimate {
   items: EstimateItem[];
   totalSum: number;
 }
+
+export const Fields = {
+  NAME: 'name',
+  QUANTITY: 'quantity',
+  PRICE_PER_UNIT: 'pricePerUnit',
+} as const ;
+
+type FieldKey = keyof typeof Fields;
+export type Field = typeof Fields[FieldKey];

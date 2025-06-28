@@ -1,5 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { v4 as uuidv4 } from 'uuid';
 import itemsReducer from './itemsSlice';
 import { EstimateItem } from '@/types';
 

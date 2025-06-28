@@ -42,32 +42,28 @@ const ToastContainer = styled.div<{ $visible: boolean; $type: ToastType }>`
 
 export interface ToastProps {
   message: string;
-  visible: boolean;
-  onClose: () => void;
   type: ToastType;
   duration?: number;
+  onClose: () => void;
 }
 
 const Toast: React.FC<ToastProps> = ({
   message,
   duration = 3000,
-  visible,
-  onClose,
-  type = 'success'
+  type = 'success',
+  onClose
 }) => {
+  const [visible, setVisible] = useState(true);
+
   useEffect(() => {
-    if (visible) {
-      const timer = setTimeout(() => {
-        onClose();
-      }, duration);
+    const t1 = setTimeout(() => setVisible(false), duration);
+    const t2 = setTimeout(onClose, duration + 300);
 
-      return () => clearTimeout(timer);
-    }
-  }, [visible, duration, onClose]);
-
-  if (!visible && !message) {
-    return null;
-  }
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [duration, onClose]);
 
   return (
     <ToastContainer $visible={visible} $type={type}>

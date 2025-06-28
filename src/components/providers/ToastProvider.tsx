@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef, PropsWithChildren } from 'react'
 import Toast, { ToastType } from '@/components/ui/Toast';
 
 interface ToastContextType {
@@ -19,70 +19,38 @@ export const useToast = () => {
   return context;
 };
 
-export interface ToastProviderProps {
-  children: React.ReactNode;
-}
+export const ToastProvider: React.FC<PropsWithChildren> = ({ children }) => {
+  const [toast, setToast] = useState<{
+    message: string;
+    type: ToastType;
+    duration: number;
+  } | null>(null);
 
-export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
-  const [toast, setToast] = useState({
-    visible: false,
-    message: '',
-    type: 'success' as ToastType,
-    duration: 3000,
-  });
-
-  const lastToastTimeRef = useRef<number>(0);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const DEBOUNCE_DELAY = 500;
 
   const showToast = useCallback((message: string, type: ToastType = 'success', duration = 3000) => {
-    const now = Date.now();
-
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
+    }
+
+    debounceTimeoutRef.current = setTimeout(() => {
+      setToast({ message, type, duration });
       debounceTimeoutRef.current = null;
-    }
-
-    if (now - lastToastTimeRef.current < DEBOUNCE_DELAY) {
-      debounceTimeoutRef.current = setTimeout(() => {
-        lastToastTimeRef.current = Date.now();
-        setToast({
-          visible: true,
-          message,
-          type,
-          duration,
-        });
-      }, DEBOUNCE_DELAY);
-    } else {
-      lastToastTimeRef.current = now;
-      setToast({
-        visible: true,
-        message,
-        type,
-        duration,
-      });
-    }
-  }, []);
-
-  const hideToast = useCallback(() => {
-    setToast(prev => ({
-      ...prev,
-      visible: false,
-    }));
+    }, DEBOUNCE_DELAY);
   }, []);
 
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      <Toast
-        message={toast.message}
-        duration={toast.duration}
-        visible={toast.visible}
-        type={toast.type}
-        onClose={hideToast}
-      />
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          duration={toast.duration}
+          type={toast.type}
+          onClose={() => setToast(null)}
+      />)}
     </ToastContext.Provider>
   );
 };
-
-export default ToastProvider;
