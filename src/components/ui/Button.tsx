@@ -1,13 +1,12 @@
 'use client';
 
-import React, { ButtonHTMLAttributes } from 'react';
+import React, { ButtonHTMLAttributes, PropsWithChildren } from 'react'
 import styled from 'styled-components';
 
 export type ButtonVariant = 'primary' | 'danger';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
-  children: React.ReactNode;
 }
 
 const StyledButton = styled.button<{ $variant: ButtonVariant }>`
@@ -33,7 +32,7 @@ const StyledButton = styled.button<{ $variant: ButtonVariant }>`
   }
 `;
 
-const Button: React.FC<ButtonProps> = ({
+const Button: React.FC<PropsWithChildren<ButtonProps>> = ({
   variant = 'primary',
   children,
   ...props

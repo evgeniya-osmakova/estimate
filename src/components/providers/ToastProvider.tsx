@@ -31,21 +31,18 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     duration: 3000,
   });
 
-  // For debouncing
   const lastToastTimeRef = useRef<number>(0);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const DEBOUNCE_DELAY = 500; // 500ms debounce delay
+  const DEBOUNCE_DELAY = 500;
 
   const showToast = useCallback((message: string, type: ToastType = 'success', duration = 3000) => {
     const now = Date.now();
 
-    // Clear any existing timeout
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
       debounceTimeoutRef.current = null;
     }
 
-    // If it's been less than DEBOUNCE_DELAY since the last toast, debounce
     if (now - lastToastTimeRef.current < DEBOUNCE_DELAY) {
       debounceTimeoutRef.current = setTimeout(() => {
         lastToastTimeRef.current = Date.now();
@@ -57,7 +54,6 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
         });
       }, DEBOUNCE_DELAY);
     } else {
-      // Otherwise show immediately
       lastToastTimeRef.current = now;
       setToast({
         visible: true,

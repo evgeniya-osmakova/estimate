@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { PropsWithChildren } from 'react'
 import styled from 'styled-components';
 import Link from 'next/link';
 import { LinkProps } from 'next/link';
@@ -9,7 +9,6 @@ export type StyledLinkVariant = 'primary' | 'secondary';
 
 export interface StyledLinkProps extends LinkProps {
   variant?: StyledLinkVariant;
-  children: React.ReactNode;
   className?: string;
   marginTop?: string;
   marginBottom?: string;
@@ -36,7 +35,7 @@ const StyledLinkComponent = styled(Link)<{
   }
 `;
 
-const StyledLink: React.FC<StyledLinkProps> = ({
+const StyledLink: React.FC<PropsWithChildren<StyledLinkProps>> = ({
   variant = 'primary',
   children,
   marginTop,

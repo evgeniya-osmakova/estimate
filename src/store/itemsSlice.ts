@@ -1,13 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { v4 as uuidv4 } from 'uuid';
-import { EstimateItem } from '@/types';
+import { Estimate, EstimateItem } from '@/types'
 
-interface ItemsState {
-  items: EstimateItem[];
-}
-
-const initialState: ItemsState = {
-  items: []
+const initialState: Estimate = {
+  id: '00000000-0000-0000-0000-000000000000',
+  items: [],
+  totalSum: 0
 };
 
 export const itemsSlice = createSlice({
@@ -24,6 +22,8 @@ export const itemsSlice = createSlice({
         totalPrice: quantity * pricePerUnit
       };
       state.items.push(newItem);
+
+      state.totalSum = state.items.reduce((sum, item) => sum + item.totalPrice, 0);
     },
 
     updateItem: (state, action: PayloadAction<{
@@ -39,12 +39,16 @@ export const itemsSlice = createSlice({
 
         if (field === 'quantity' || field === 'pricePerUnit') {
           item.totalPrice = item.quantity * item.pricePerUnit;
+
+          state.totalSum = state.items.reduce((sum, item) => sum + item.totalPrice, 0);
         }
       }
     },
 
     deleteItem: (state, action: PayloadAction<string>) => {
       state.items = state.items.filter(item => item.id !== action.payload);
+
+      state.totalSum = state.items.reduce((sum, item) => sum + item.totalPrice, 0);
     }
   }
 });
@@ -52,6 +56,6 @@ export const itemsSlice = createSlice({
 export const { addItem, updateItem, deleteItem } = itemsSlice.actions;
 export default itemsSlice.reducer;
 
-export const selectItems = (state: { items: ItemsState }) => state.items.items;
-export const selectTotalSum = (state: { items: ItemsState }) =>
-  state.items.items.reduce((sum, item) => sum + item.totalPrice, 0);
+export const selectItems = (state: { items: Estimate }) => state.items.items;
+export const selectTotalSum = (state: { items: Estimate }) => state.items.totalSum;
+export const selectEstimateId = (state: { items: Estimate }) => state.items.id;

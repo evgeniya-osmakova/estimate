@@ -8,9 +8,10 @@ import { v4 as uuidv4 } from 'uuid';
 import Button from '@/components/ui/Button';
 import StyledLink from '@/components/ui/StyledLink';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { addItem, updateItem, deleteItem, selectItems, selectTotalSum } from '@/store/itemsSlice';
+import { addItem, updateItem, deleteItem, selectItems, selectTotalSum, selectEstimateId } from '@/store/itemsSlice';
 import { EstimateItem } from '@/types';
 import { useToast } from '@/components/providers/ToastProvider';
+import SaveStatus from '@/components/ui/SaveStatus';
 import {
   CellInput,
   EditableCell,
@@ -29,6 +30,7 @@ export default function Home() {
   const dispatch = useAppDispatch();
   const items = useAppSelector(selectItems);
   const totalSum = useAppSelector(selectTotalSum);
+  const estimateId = useAppSelector(selectEstimateId);
   const { showToast } = useToast();
 
   const formSchema = z.object({
@@ -54,13 +56,16 @@ export default function Home() {
     }
   });
 
-  // Show error toast when validation fails
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
       const errorMessages = Object.values(errors).map(error => error.message);
       showToast(`Validation error: ${errorMessages.join(', ')}`, 'error');
     }
   }, [errors, showToast]);
+
+  useEffect(() => {
+    showToast("Autosave enabled: All changes are automatically saved", 'success', 5000);
+  }, [showToast]);
 
   const watchedValues = watch();
 
@@ -102,7 +107,7 @@ export default function Home() {
         value
       }));
 
-      showToast("Estimate saved", 'success');
+      showToast("Changes saved automatically", 'success');
 
       setEditingCell({ itemId: null, field: null });
       setEditValue('');
@@ -143,7 +148,7 @@ export default function Home() {
       pricePerUnit: data.price
     }));
 
-    showToast("Estimate saved", 'success');
+    showToast("Changes saved automatically", 'success');
 
     reset({
       name: '',
@@ -154,41 +159,34 @@ export default function Home() {
 
   const handleDelete = (id: string) => {
     dispatch(deleteItem(id));
-    showToast("Estimate saved", 'success');
+    showToast("Changes saved automatically", 'success');
   };
 
   const handleDownloadJSON = () => {
-    // Create the estimate object with the current data
     const estimate = {
-      id: uuidv4(), // Generate a unique ID for this estimate
+      id: estimateId,
       items: items,
       totalSum: totalSum
     };
 
-    // Convert the estimate object to a JSON string
     const jsonString = JSON.stringify(estimate, null, 2);
 
-    // Create a blob from the JSON string
     const blob = new Blob([jsonString], { type: 'application/json' });
 
-    // Create a URL for the blob
     const url = URL.createObjectURL(blob);
-
-    // Create a temporary anchor element to trigger the download
     const a = document.createElement('a');
     a.href = url;
     a.download = `estimate-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(a);
     a.click();
 
-    // Clean up
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
     showToast("Estimate downloaded", 'success');
   };
 
-  const tableHeaders = ['Name', 'Quantity', 'Price per unit', 'Total', 'Actions'];
+  const tableHeaders = ['Name', 'Quantity', 'Price per unit', 'Actions'];
 
   return (
     <Container>
@@ -210,6 +208,7 @@ export default function Home() {
           {items.map((item) => (
             <tr key={item.id}>
               <EditableCell
+                  $width="700px"
                 $isEditing={editingCell.itemId === item.id && editingCell.field === 'name'}
                 onClick={() => handleCellClick(item.id, 'name', item.name)}
               >
@@ -228,6 +227,7 @@ export default function Home() {
               </EditableCell>
 
               <EditableCell
+                  $width="100px"
                 $isEditing={editingCell.itemId === item.id && editingCell.field === 'quantity'}
                 onClick={() => handleCellClick(item.id, 'quantity', item.quantity)}
               >
@@ -247,6 +247,7 @@ export default function Home() {
               </EditableCell>
 
               <EditableCell
+                  $width="200px"
                 $isEditing={editingCell.itemId === item.id && editingCell.field === 'pricePerUnit'}
                 onClick={() => handleCellClick(item.id, 'pricePerUnit', item.pricePerUnit)}
               >
@@ -266,8 +267,6 @@ export default function Home() {
                 )}
               </EditableCell>
 
-              <TableCell>{`${item.totalPrice} $`}</TableCell>
-
               <CenteredCell>
                 <Button variant="danger" onClick={() => handleDelete(item.id)}>
                   Delete
@@ -279,7 +278,7 @@ export default function Home() {
 
         <tfoot>
           <tr>
-            <TableCell>
+            <TableCell $width="700px">
               <div style={{ position: 'relative' }}>
                 <Input
                   type="text"
@@ -294,7 +293,7 @@ export default function Home() {
                 )}
               </div>
             </TableCell>
-            <TableCell>
+            <TableCell  $width="100px">
               <div style={{ position: 'relative' }}>
                 <Input
                   type="number"
@@ -310,7 +309,7 @@ export default function Home() {
                 )}
               </div>
             </TableCell>
-            <TableCell>
+            <TableCell $width="195px">
               <div style={{ position: 'relative' }}>
                 <Input
                   type="number"
@@ -326,11 +325,6 @@ export default function Home() {
                   </div>
                 )}
               </div>
-            </TableCell>
-            <TableCell>
-              {watchedValues.name && watchedValues.quantity && watchedValues.price
-                ? `${watchedValues.quantity * watchedValues.price} $`
-                : ''}
             </TableCell>
             <CenteredCell>
               <Button
@@ -348,6 +342,7 @@ export default function Home() {
         <Button onClick={handleDownloadJSON}>Download JSON</Button>
         <TotalSum>Total: {totalSum} $</TotalSum>
       </ActionsContainer>
+      <SaveStatus />
     </Container>
   );
 }

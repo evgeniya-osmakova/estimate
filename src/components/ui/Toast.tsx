@@ -42,10 +42,10 @@ const ToastContainer = styled.div<{ $visible: boolean; $type: ToastType }>`
 
 export interface ToastProps {
   message: string;
-  duration?: number;
   visible: boolean;
   onClose: () => void;
   type: ToastType;
+  duration?: number;
 }
 
 const Toast: React.FC<ToastProps> = ({
