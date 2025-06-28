@@ -82,7 +82,7 @@ export const NewItemRow: React.FC = () => {
 
         <CenteredCell>
           <Button
-            disabled={isSubmitting}
+            disabled={isSubmitting || Object.keys(errors).length > 0}
             onClick={handleSubmit(onSubmit)}
           >
             Add

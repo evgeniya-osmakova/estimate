@@ -30,12 +30,14 @@ export const ItemRow: React.FC<ItemRowProps> = React.memo(({ id, name, quantity,
   const cancelEdit = () => setEditing(null);
 
   const saveEdit = () => {
-    if (editing) {
-      const parsed = editing === Fields.NAME ? value : parseFloat(value) || 0;
-      dispatch(updateItem({ id, field: editing, value: parsed }));
-      showToast('Changes saved');
-      cancelEdit();
+    if (!editing) {
+      return;
     }
+
+    const parsed = editing === Fields.NAME ? value : parseFloat(value) || 0;
+    dispatch(updateItem({ id, field: editing, value: parsed }));
+    showToast('Changes saved');
+    cancelEdit();
   };
 
   const onKey = (e: React.KeyboardEvent) => {
