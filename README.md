@@ -108,12 +108,12 @@ interface EstimateItem {
     name: string;
     quantity: number;
     pricePerUnit: number;
-    totalPrice: number; // calculated as quantity * pricePerUnit
+    totalPrice: number;
 }
 
 interface Estimate {
     id: string;
     items: EstimateItem[];
-    totalSum: number; // calculated as the sum of all item totalPrice values
+    totalSum: number;
 }
 ```
