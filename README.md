@@ -2,6 +2,8 @@
 
 A web application for creating and managing estimates with real-time calculations and autosave functionality.
 
+<img width="1284" alt="Screenshot 2025-06-29 at 20 27 15" src="https://github.com/user-attachments/assets/0fdb93eb-b4cb-4fc6-98ba-98c8858a4e53" />
+
 ## [Demo](https://estimate-v3v5.vercel.app/)
 
 ## Features
