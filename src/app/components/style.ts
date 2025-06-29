@@ -6,6 +6,9 @@ export const TableCell = styled.td<{ $width?: string }>`
     height: 45px;
     position: relative;
     width: ${props => props.$width ?? 'auto'};
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 `;
 
 export const EditableCell = styled(TableCell)<{ $isEditing: boolean, $width?: string }>`
@@ -13,7 +16,6 @@ export const EditableCell = styled(TableCell)<{ $isEditing: boolean, $width?: st
     background-color: ${props => props.$isEditing ? 'var(--color-light-gray)' : 'transparent'};
     max-width: ${props => props.$width};
     width: ${props => props.$width ?? 'auto'};
-    word-wrap: break-word;
 
     &:hover {
         background-color: var(--color-light-gray);

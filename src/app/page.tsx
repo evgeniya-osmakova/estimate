@@ -25,8 +25,7 @@ export default function Home() {
     const totalSum = useAppSelector(selectTotalSum);
     const estimateId = useAppSelector(selectEstimateId);
     const { showToast } = useToast();
-
-    const isFirstRender = useRef(true);
+    const [shouldSave, setShouldSave] = React.useState(false);
 
     useEffect(() => {
         try {
@@ -41,13 +40,7 @@ export default function Home() {
     }, [dispatch]);
 
     useEffect(() => {
-        if (items.length === 0) {
-            return;
-        }
-
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-
+        if (!shouldSave) {
             return;
         }
 
@@ -65,7 +58,9 @@ export default function Home() {
         } catch (err) {
             showToast(`Error saving state to localStorage: ${err}`, 'error');
         }
-    }, [items, estimateId, totalSum]);
+
+        setShouldSave(false);
+    }, [shouldSave, items, estimateId, totalSum]);
 
     const handleDownload = useCallback(() => {
         const data = {
@@ -110,11 +105,12 @@ export default function Home() {
                             name={item.name}
                             quantity={item.quantity}
                             pricePerUnit={item.pricePerUnit}
+                            setShouldSave={setShouldSave}
                         />
                     ))}
                 </tbody>
 
-                <NewItemRow />
+                <NewItemRow setShouldSave={setShouldSave} />
             </Table>
 
             <ActionsContainer>

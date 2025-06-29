@@ -21,9 +21,10 @@ interface ItemRowProps {
     name: string;
     quantity: number;
     pricePerUnit: number;
+    setShouldSave: (shouldSave: boolean) => void;
 }
 
-export const ItemRow: React.FC<ItemRowProps> = ({ id, name, quantity, pricePerUnit }) => {
+export const ItemRow: React.FC<ItemRowProps> = ({ id, name, quantity, pricePerUnit, setShouldSave }) => {
     const dispatch = useAppDispatch();
     const { showToast } = useToast();
     const [editing, setEditing] = useState<Field | null>(null);
@@ -70,6 +71,7 @@ export const ItemRow: React.FC<ItemRowProps> = ({ id, name, quantity, pricePerUn
         dispatch(updateItem({ id, field: editing, value }));
         showToast('Changes saved');
         cancelEdit();
+        setShouldSave(true);
     };
 
     return (
@@ -100,6 +102,7 @@ export const ItemRow: React.FC<ItemRowProps> = ({ id, name, quantity, pricePerUn
                         key={field}
                         $width={width}
                         $isEditing={editing === field}
+                        title={String(text)}
                         onClick={() => {
                             if (editing && editing !== field) {
                                 handleSubmit(onSave, onError)();
@@ -159,6 +162,7 @@ export const ItemRow: React.FC<ItemRowProps> = ({ id, name, quantity, pricePerUn
                     onClick={() => {
                         dispatch(deleteItem(id));
                         showToast('Item deleted');
+                        setShouldSave(true);
                     }}
                 >
                     Delete

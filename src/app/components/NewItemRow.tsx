@@ -9,7 +9,11 @@ import React from 'react'
 import { FORM_SCHEMA } from '@/constants/form'
 import { FormData } from '@/types'
 
-export const NewItemRow: React.FC = () => {
+interface Props {
+    setShouldSave: (shouldSave: boolean) => void;
+}
+
+export const NewItemRow: React.FC<Props> = ({ setShouldSave }) => {
     const dispatch = useAppDispatch();
     const { showToast } = useToast();
 
@@ -29,6 +33,7 @@ export const NewItemRow: React.FC = () => {
         );
         showToast('Item was added');
         reset();
+        setShouldSave(true);
     };
 
     const onError: SubmitErrorHandler<FormData> = () => {
