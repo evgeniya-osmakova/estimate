@@ -6,22 +6,22 @@ import { ToastProvider } from '@/components/providers/ToastProvider';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Estimate Editor',
-  description: 'An application for creating and editing estimates',
+    title: 'Estimate Editor',
+    description: 'An application for creating and editing estimates',
 };
 
 export default function RootLayout({ children }: PropsWithChildren) {
-  return (
-    <html lang="en">
-      <body>
-        <ReduxProvider>
-          <ToastProvider>
-            <StyledComponentsRegistry>
-              {children}
-            </StyledComponentsRegistry>
-          </ToastProvider>
-        </ReduxProvider>
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en">
+            <body>
+                <ReduxProvider>
+                    <ToastProvider>
+                        <StyledComponentsRegistry>
+                            {children}
+                        </StyledComponentsRegistry>
+                    </ToastProvider>
+                </ReduxProvider>
+            </body>
+        </html>
+    );
 }

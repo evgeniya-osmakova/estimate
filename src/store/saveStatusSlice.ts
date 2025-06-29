@@ -1,24 +1,24 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 interface SaveStatusState {
-  isSaving: boolean;
+    isSaving: boolean;
 }
 
 const initialState: SaveStatusState = {
-  isSaving: false,
+    isSaving: false,
 };
 
 export const saveStatusSlice = createSlice({
-  name: 'saveStatus',
-  initialState,
-  reducers: {
-    setSaving: (state) => {
-      state.isSaving = true;
+    name: 'saveStatus',
+    initialState,
+    reducers: {
+        setSaving: (state) => {
+            state.isSaving = true;
+        },
+        setSaved: (state) => {
+            state.isSaving = false;
+        },
     },
-    setSaved: (state) => {
-      state.isSaving = false;
-    },
-  },
 });
 
 export const { setSaving, setSaved } = saveStatusSlice.actions;
