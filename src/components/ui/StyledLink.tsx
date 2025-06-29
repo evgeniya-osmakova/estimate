@@ -22,8 +22,8 @@ const StyledLinkComponent = styled(Link)<{
     display: inline-block;
     padding: ${props => props.$variant === 'primary' ? '10px 15px' : '8px 12px'};
     background-color: ${props => 
-        props.$variant === 'primary' ? '#4caf50' : '#2196f3'};
-    color: white;
+        props.$variant === 'primary' ? 'var(--color-primary)' : 'var(--color-secondary)'};
+    color: var(--color-white);
     text-decoration: none;
     border-radius: 4px;
     margin-top: ${props => props.$marginTop || '0'};
@@ -31,7 +31,7 @@ const StyledLinkComponent = styled(Link)<{
 
     &:hover {
         background-color: ${props => 
-            props.$variant === 'primary' ? '#45a049' : '#0b7dda'};
+            props.$variant === 'primary' ? 'var(--color-primary-dark)' : 'var(--color-secondary-dark)'};
     }
 `;
 

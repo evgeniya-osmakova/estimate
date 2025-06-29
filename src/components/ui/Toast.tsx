@@ -31,11 +31,11 @@ const ToastContainer = styled.div<{ $visible: boolean; $type: ToastType }>`
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: ${props => props.$type === 'success' ? '#4caf50' : '#f44336'};
-    color: white;
+    background-color: ${props => props.$type === 'success' ? 'var(--color-primary)' : 'var(--color-error)'};
+    color: var(--color-white);
     padding: 16px 24px;
     border-radius: 4px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px var(--color-shadow);
     z-index: 1000;
     animation: ${props => props.$visible ? slideIn : slideOut} 0.3s ease-in-out forwards;
 `;

@@ -2,7 +2,7 @@ import styled from 'styled-components'
 
 export const TableCell = styled.td<{ $width?: string }>`
     padding: 15px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border);
     height: 45px;
     position: relative;
     width: ${props => props.$width ?? 'auto'};
@@ -10,13 +10,13 @@ export const TableCell = styled.td<{ $width?: string }>`
 
 export const EditableCell = styled(TableCell)<{ $isEditing: boolean, $width?: string }>`
     cursor: pointer;
-    background-color: ${props => props.$isEditing ? '#f9f9f9' : 'transparent'};
+    background-color: ${props => props.$isEditing ? 'var(--color-light-gray)' : 'transparent'};
     max-width: ${props => props.$width};
     width: ${props => props.$width ?? 'auto'};
     word-wrap: break-word;
 
     &:hover {
-        background-color: #f9f9f9;
+        background-color: var(--color-light-gray);
     }
 `;
 
@@ -28,7 +28,7 @@ export const CenteredCell = styled(TableCell)`
 export const Input = styled.input`
     width: 100%;
     padding: 0 5px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border);
     border-radius: 4px;
     height: 30px;
     box-sizing: border-box;
@@ -38,7 +38,7 @@ export const Input = styled.input`
 
 export const CellInput = styled(Input)`
     height: 25px;
-    
+
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
         -webkit-appearance: none;
@@ -47,7 +47,7 @@ export const CellInput = styled(Input)`
 `;
 
 export const Error = styled.div`
-    color: red;
+    color: var(--color-error);
     font-size: 12px;
     position: absolute;
 `;

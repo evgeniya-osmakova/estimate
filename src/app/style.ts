@@ -33,8 +33,8 @@ export const Table = styled.table`
 `;
 
 export const TableHeader = styled.th`
-    background-color: #f2f2f2;
+    background-color: var(--color-gray);
     padding: 10px;
     text-align: left;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border);
 `;

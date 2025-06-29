@@ -15,8 +15,8 @@ const SaveStatusContainer = styled.div<{ $visible: boolean }>`
     position: fixed;
     bottom: 20px;
     left: 50%;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
+    background-color: var(--color-overlay);
+    color: var(--color-white);
     padding: 8px 16px;
     border-radius: 4px;
     font-size: 14px;

@@ -12,8 +12,8 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const StyledButton = styled.button<{ $variant: ButtonVariant }>`
     padding: 5px 10px;
     background-color: ${props => 
-        props.$variant === 'primary' ? '#4caf50' : '#f44336'};
-    color: white;
+        props.$variant === 'primary' ? 'var(--color-primary)' : 'var(--color-danger)'};
+    color: var(--color-white);
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -23,11 +23,11 @@ const StyledButton = styled.button<{ $variant: ButtonVariant }>`
 
     &:hover {
         background-color: ${props => 
-            props.$variant === 'primary' ? '#45a049' : '#d32f2f'};
+            props.$variant === 'primary' ? 'var(--color-primary-dark)' : 'var(--color-danger-dark)'};
     }
 
     &:disabled {
-        background-color: #cccccc;
+        background-color: var(--color-disabled);
         cursor: not-allowed;
     }
 `;

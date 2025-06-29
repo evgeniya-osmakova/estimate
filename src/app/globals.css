@@ -1,6 +1,26 @@
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-rgb: 255, 255, 255;
+
+  /* Primary colors */
+  --color-primary: #4caf50;
+  --color-primary-dark: #45a049;
+  --color-secondary: #2196f3;
+  --color-secondary-dark: #0b7dda;
+  --color-danger: #f44336;
+  --color-danger-dark: #d32f2f;
+
+  /* Neutral colors */
+  --color-white: #ffffff;
+  --color-light-gray: #f9f9f9;
+  --color-gray: #f2f2f2;
+  --color-border: #ddd;
+  --color-disabled: #cccccc;
+  --color-error: #f44336;
+
+  /* Transparent colors */
+  --color-shadow: rgba(0, 0, 0, 0.2);
+  --color-overlay: rgba(0, 0, 0, 0.7);
 }
 
 * {
